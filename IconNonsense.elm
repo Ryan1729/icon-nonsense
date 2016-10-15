@@ -1,4 +1,4 @@
-module Main exposing (..)
+module IconNonsense exposing (..)
 
 import Html.App exposing (program)
 import Html exposing (Html)
