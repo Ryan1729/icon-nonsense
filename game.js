@@ -9910,20 +9910,23 @@ var _user$project$IconNonsense$getCorrectString = function (info) {
 			return info.third;
 	}
 };
-var _user$project$IconNonsense$Model = F2(
-	function (a, b) {
-		return {iconNames: a, questionInfo: b};
+var _user$project$IconNonsense$Model = F3(
+	function (a, b, c) {
+		return {iconNames: a, questionInfo: b, mode: c};
 	});
 var _user$project$IconNonsense$QuestionInfo = F4(
 	function (a, b, c, d) {
 		return {first: a, second: b, third: c, correctEntry: d};
 	});
+var _user$project$IconNonsense$ChooseName = {ctor: 'ChooseName'};
+var _user$project$IconNonsense$ChooseIcon = {ctor: 'ChooseIcon'};
 var _user$project$IconNonsense$IncorrectSelection = {ctor: 'IncorrectSelection'};
-var _user$project$IconNonsense$CorrectSelection = {ctor: 'CorrectSelection'};
 var _user$project$IconNonsense$SetQuestionInfo = function (a) {
 	return {ctor: 'SetQuestionInfo', _0: a};
 };
-var _user$project$IconNonsense$GetNextQuestionInfo = {ctor: 'GetNextQuestionInfo'};
+var _user$project$IconNonsense$GetNextQuestionInfo = function (a) {
+	return {ctor: 'GetNextQuestionInfo', _0: a};
+};
 var _user$project$IconNonsense$RecieveIconName = function (a) {
 	return {ctor: 'RecieveIconName', _0: a};
 };
@@ -9942,7 +9945,8 @@ var _user$project$IconNonsense$init = A2(
 		iconNames: _elm_lang$core$Array$fromList(
 			_elm_lang$core$Native_List.fromArray(
 				[])),
-		questionInfo: _elm_lang$core$Maybe$Nothing
+		questionInfo: _elm_lang$core$Maybe$Nothing,
+		mode: _user$project$IconNonsense$ChooseIcon
 	},
 	_elm_lang$core$Native_List.fromArray(
 		[_user$project$IconNonsense$getIconNames]));
@@ -10008,18 +10012,9 @@ var _user$project$IconNonsense$update = F2(
 			case 'GetNextQuestionInfo':
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
-					model,
-					_elm_lang$core$Native_List.fromArray(
-						[
-							A2(
-							_elm_lang$core$Random$generate,
-							_user$project$IconNonsense$SetQuestionInfo,
-							_user$project$IconNonsense$getQuestionInfoGenerator(model.iconNames))
-						]));
-			case 'CorrectSelection':
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					model,
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{mode: _p7._0}),
 					_elm_lang$core$Native_List.fromArray(
 						[
 							A2(
@@ -10045,48 +10040,16 @@ var _user$project$IconNonsense$update = F2(
 						[]));
 		}
 	});
-var _user$project$IconNonsense$getListOfButtons = function (info) {
-	return _elm_lang$core$Native_List.fromArray(
-		[
-			A2(
-			_elm_lang$html$Html$button,
-			_elm_lang$core$Native_List.fromArray(
-				[
-					_elm_lang$html$Html_Events$onClick(
-					_elm_lang$core$Native_Utils.eq(info.correctEntry, _user$project$IconNonsense$First) ? _user$project$IconNonsense$CorrectSelection : _user$project$IconNonsense$IncorrectSelection)
-				]),
-			_elm_lang$core$Native_List.fromArray(
-				[
-					_elm_lang$html$Html$text(info.first)
-				])),
-			A2(
-			_elm_lang$html$Html$button,
-			_elm_lang$core$Native_List.fromArray(
-				[
-					_elm_lang$html$Html_Events$onClick(
-					_elm_lang$core$Native_Utils.eq(info.correctEntry, _user$project$IconNonsense$Second) ? _user$project$IconNonsense$CorrectSelection : _user$project$IconNonsense$IncorrectSelection)
-				]),
-			_elm_lang$core$Native_List.fromArray(
-				[
-					_elm_lang$html$Html$text(info.second)
-				])),
-			A2(
-			_elm_lang$html$Html$button,
-			_elm_lang$core$Native_List.fromArray(
-				[
-					_elm_lang$html$Html_Events$onClick(
-					_elm_lang$core$Native_Utils.eq(info.correctEntry, _user$project$IconNonsense$Third) ? _user$project$IconNonsense$CorrectSelection : _user$project$IconNonsense$IncorrectSelection)
-				]),
-			_elm_lang$core$Native_List.fromArray(
-				[
-					_elm_lang$html$Html$text(info.third)
-				]))
-		]);
-};
-var _user$project$IconNonsense$view = function (model) {
-	var _p8 = model.questionInfo;
-	if (_p8.ctor === 'Just') {
-		var _p9 = _p8._0;
+var _user$project$IconNonsense$getListOfButtons = F2(
+	function (mode, info) {
+		var viewFunction = function () {
+			var _p8 = mode;
+			if (_p8.ctor === 'ChooseName') {
+				return _elm_lang$html$Html$text;
+			} else {
+				return _user$project$IconNonsense$viewIcon;
+			}
+		}();
 		return A2(
 			_elm_lang$html$Html$div,
 			_elm_lang$core$Native_List.fromArray(
@@ -10095,40 +10058,116 @@ var _user$project$IconNonsense$view = function (model) {
 					_elm_lang$core$Native_List.fromArray(
 						[
 							{ctor: '_Tuple2', _0: 'display', _1: 'flex'},
-							{ctor: '_Tuple2', _0: 'flex-direction', _1: 'column'},
-							{ctor: '_Tuple2', _0: 'align-items', _1: 'center'}
+							{ctor: '_Tuple2', _0: 'flex-direction', _1: 'row'}
 						]))
 				]),
 			_elm_lang$core$Native_List.fromArray(
 				[
-					_elm_lang$html$Html$text('Pick the name they gave this icon'),
-					_user$project$IconNonsense$viewIcon(
-					_user$project$IconNonsense$getCorrectString(_p9)),
 					A2(
-					_elm_lang$html$Html$div,
+					_elm_lang$html$Html$button,
 					_elm_lang$core$Native_List.fromArray(
 						[
-							_elm_lang$html$Html_Attributes$style(
+							_elm_lang$html$Html_Events$onClick(
+							_elm_lang$core$Native_Utils.eq(info.correctEntry, _user$project$IconNonsense$First) ? _user$project$IconNonsense$GetNextQuestionInfo(mode) : _user$project$IconNonsense$IncorrectSelection)
+						]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							viewFunction(info.first)
+						])),
+					A2(
+					_elm_lang$html$Html$button,
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html_Events$onClick(
+							_elm_lang$core$Native_Utils.eq(info.correctEntry, _user$project$IconNonsense$Second) ? _user$project$IconNonsense$GetNextQuestionInfo(mode) : _user$project$IconNonsense$IncorrectSelection)
+						]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							viewFunction(info.second)
+						])),
+					A2(
+					_elm_lang$html$Html$button,
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html_Events$onClick(
+							_elm_lang$core$Native_Utils.eq(info.correctEntry, _user$project$IconNonsense$Third) ? _user$project$IconNonsense$GetNextQuestionInfo(mode) : _user$project$IconNonsense$IncorrectSelection)
+						]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							viewFunction(info.third)
+						]))
+				]));
+	});
+var _user$project$IconNonsense$view = function (model) {
+	return A2(
+		_elm_lang$html$Html$div,
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Attributes$style(
+				_elm_lang$core$Native_List.fromArray(
+					[
+						{ctor: '_Tuple2', _0: 'display', _1: 'flex'},
+						{ctor: '_Tuple2', _0: 'flex-direction', _1: 'column'},
+						{ctor: '_Tuple2', _0: 'align-items', _1: 'center'}
+					]))
+			]),
+		function () {
+			var _p9 = model.questionInfo;
+			if (_p9.ctor === 'Just') {
+				var _p11 = _p9._0;
+				var _p10 = model.mode;
+				if (_p10.ctor === 'ChooseName') {
+					return _elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html$text('Pick the name they gave to this icon:'),
+							_user$project$IconNonsense$viewIcon(
+							_user$project$IconNonsense$getCorrectString(_p11)),
+							A2(_user$project$IconNonsense$getListOfButtons, model.mode, _p11)
+						]);
+				} else {
+					return _elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html$text('Pick the icon they gave this name to:'),
+							A2(
+							_elm_lang$html$Html$strong,
+							_elm_lang$core$Native_List.fromArray(
+								[]),
 							_elm_lang$core$Native_List.fromArray(
 								[
-									{ctor: '_Tuple2', _0: 'display', _1: 'flex'},
-									{ctor: '_Tuple2', _0: 'flex-direction', _1: 'row'}
-								]))
-						]),
-					_user$project$IconNonsense$getListOfButtons(_p9))
-				]));
-	} else {
-		return A2(
-			_elm_lang$html$Html$button,
-			_elm_lang$core$Native_List.fromArray(
-				[
-					_elm_lang$html$Html_Events$onClick(_user$project$IconNonsense$GetNextQuestionInfo)
-				]),
-			_elm_lang$core$Native_List.fromArray(
-				[
-					_elm_lang$html$Html$text('Start')
-				]));
-	}
+									_elm_lang$html$Html$text(
+									_user$project$IconNonsense$getCorrectString(_p11))
+								])),
+							A2(_user$project$IconNonsense$getListOfButtons, model.mode, _p11)
+						]);
+				}
+			} else {
+				return _elm_lang$core$Native_List.fromArray(
+					[
+						A2(
+						_elm_lang$html$Html$button,
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html_Events$onClick(
+								_user$project$IconNonsense$GetNextQuestionInfo(_user$project$IconNonsense$ChooseIcon))
+							]),
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html$text('Choose Icon Mode')
+							])),
+						A2(
+						_elm_lang$html$Html$button,
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html_Events$onClick(
+								_user$project$IconNonsense$GetNextQuestionInfo(_user$project$IconNonsense$ChooseName))
+							]),
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html$text('Choose Name Mode')
+							]))
+					]);
+			}
+		}());
 };
 var _user$project$IconNonsense$main = {
 	main: _elm_lang$html$Html_App$program(

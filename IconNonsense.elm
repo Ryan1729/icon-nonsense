@@ -16,7 +16,13 @@ import Array exposing (Array)
 type alias Model =
     { iconNames : Array String
     , questionInfo : Maybe QuestionInfo
+    , mode : Mode
     }
+
+
+type Mode
+    = ChooseIcon
+    | ChooseName
 
 
 getIconNames : Cmd Msg
@@ -27,14 +33,13 @@ getIconNames =
 
 init : ( Model, Cmd Msg )
 init =
-    { iconNames = Array.fromList [], questionInfo = Nothing } ! [ getIconNames ]
+    { iconNames = Array.fromList [], questionInfo = Nothing, mode = ChooseIcon } ! [ getIconNames ]
 
 
 type Msg
     = RecieveIconName (Array String)
-    | GetNextQuestionInfo
+    | GetNextQuestionInfo Mode
     | SetQuestionInfo QuestionInfo
-    | CorrectSelection
     | IncorrectSelection
 
 
@@ -44,11 +49,8 @@ update msg model =
         RecieveIconName newNames ->
             { model | iconNames = newNames } ! []
 
-        GetNextQuestionInfo ->
-            model ! [ Random.generate SetQuestionInfo (getQuestionInfoGenerator model.iconNames) ]
-
-        CorrectSelection ->
-            model ! [ Random.generate SetQuestionInfo (getQuestionInfoGenerator model.iconNames) ]
+        GetNextQuestionInfo mode ->
+            { model | mode = mode } ! [ Random.generate SetQuestionInfo (getQuestionInfoGenerator model.iconNames) ]
 
         SetQuestionInfo info ->
             { model | questionInfo = Just info } ! []
@@ -129,46 +131,65 @@ getQuestionInfoGenerator deck =
 
 view : Model -> Html Msg
 view model =
-    case model.questionInfo of
-        Just info ->
-            div [ style [ ( "display", "flex" ), ( "flex-direction", "column" ), ( "align-items", "center" ) ] ]
-                [ text "Pick the name they gave this icon"
-                , info |> getCorrectString |> viewIcon
-                , div [ style [ ( "display", "flex" ), ( "flex-direction", "row" ) ] ]
-                    <| getListOfButtons info
+    div [ style [ ( "display", "flex" ), ( "flex-direction", "column" ), ( "align-items", "center" ) ] ]
+        <| case model.questionInfo of
+            Just info ->
+                case model.mode of
+                    ChooseName ->
+                        [ text "Pick the name they gave to this icon:"
+                        , info |> getCorrectString |> viewIcon
+                        , getListOfButtons model.mode info
+                        ]
+
+                    ChooseIcon ->
+                        [ text "Pick the icon they gave this name to:"
+                        , [ info |> getCorrectString |> text ] |> Html.strong []
+                        , getListOfButtons model.mode info
+                        ]
+
+            Nothing ->
+                [ Html.button [ onClick <| GetNextQuestionInfo ChooseIcon ] [ text "Choose Icon Mode" ]
+                , Html.button [ onClick <| GetNextQuestionInfo ChooseName ] [ text "Choose Name Mode" ]
                 ]
 
-        Nothing ->
-            Html.button [ onClick GetNextQuestionInfo ] [ text "Start" ]
 
+getListOfButtons : Mode -> QuestionInfo -> Html Msg
+getListOfButtons mode info =
+    let
+        viewFunction =
+            case mode of
+                ChooseName ->
+                    text
 
-getListOfButtons : QuestionInfo -> List (Html Msg)
-getListOfButtons info =
-    [ Html.button
-        [ onClick
-            <| if info.correctEntry == First then
-                CorrectSelection
-               else
-                IncorrectSelection
-        ]
-        [ text info.first ]
-    , Html.button
-        [ onClick
-            <| if info.correctEntry == Second then
-                CorrectSelection
-               else
-                IncorrectSelection
-        ]
-        [ text info.second ]
-    , Html.button
-        [ onClick
-            <| if info.correctEntry == Third then
-                CorrectSelection
-               else
-                IncorrectSelection
-        ]
-        [ text info.third ]
-    ]
+                ChooseIcon ->
+                    viewIcon
+    in
+        div [ style [ ( "display", "flex" ), ( "flex-direction", "row" ) ] ]
+            [ Html.button
+                [ onClick
+                    <| if info.correctEntry == First then
+                        GetNextQuestionInfo mode
+                       else
+                        IncorrectSelection
+                ]
+                [ viewFunction info.first ]
+            , Html.button
+                [ onClick
+                    <| if info.correctEntry == Second then
+                        GetNextQuestionInfo mode
+                       else
+                        IncorrectSelection
+                ]
+                [ viewFunction info.second ]
+            , Html.button
+                [ onClick
+                    <| if info.correctEntry == Third then
+                        GetNextQuestionInfo mode
+                       else
+                        IncorrectSelection
+                ]
+                [ viewFunction info.third ]
+            ]
 
 
 viewIcon : String -> Html Msg
