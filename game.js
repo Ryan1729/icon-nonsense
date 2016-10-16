@@ -10101,8 +10101,7 @@ var _user$project$IconNonsense$view = function (model) {
 				]),
 			_elm_lang$core$Native_List.fromArray(
 				[
-					_elm_lang$html$Html$text(
-					_elm_lang$core$Basics$toString(_p9)),
+					_elm_lang$html$Html$text('Pick the name they gave this icon'),
 					_user$project$IconNonsense$viewIcon(
 					_user$project$IconNonsense$getCorrectString(_p9)),
 					A2(

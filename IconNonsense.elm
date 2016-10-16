@@ -132,7 +132,7 @@ view model =
     case model.questionInfo of
         Just info ->
             div [ style [ ( "display", "flex" ), ( "flex-direction", "column" ), ( "align-items", "center" ) ] ]
-                [ text <| toString info
+                [ text "Pick the name they gave this icon"
                 , info |> getCorrectString |> viewIcon
                 , div [ style [ ( "display", "flex" ), ( "flex-direction", "row" ) ] ]
                     <| getListOfButtons info
