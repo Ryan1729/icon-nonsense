@@ -5,33 +5,37 @@ import Html exposing (Html, div, text)
 import Html.Events exposing (onClick)
 import Material.Icon as Icon
 import Http
-import Json.Decode exposing (list, string)
+import Json.Decode exposing (array, string)
 import Task
 import Random exposing (Generator)
 import Html.Attributes exposing (style)
+import Random.Array
+import Array exposing (Array)
 
 
 type alias Model =
-    { iconNames : List String
+    { iconNames : Array String
     , questionInfo : Maybe QuestionInfo
     }
 
 
 getIconNames : Cmd Msg
 getIconNames =
-    Http.get (list string) "icon-names.json"
+    Http.get (array string) "icon-names.json"
         |> Task.perform (always (RecieveIconName fallbackIconNames)) RecieveIconName
 
 
 init : ( Model, Cmd Msg )
 init =
-    { iconNames = [], questionInfo = Nothing } ! [ getIconNames ]
+    { iconNames = Array.fromList [], questionInfo = Nothing } ! [ getIconNames ]
 
 
 type Msg
-    = RecieveIconName (List String)
+    = RecieveIconName (Array String)
     | GetNextQuestionInfo
     | SetQuestionInfo QuestionInfo
+    | CorrectSelection
+    | IncorrectSelection
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -41,20 +45,86 @@ update msg model =
             { model | iconNames = newNames } ! []
 
         GetNextQuestionInfo ->
-            model ! [ Random.generate SetQuestionInfo questionInfoGenerator ]
+            model ! [ Random.generate SetQuestionInfo (getQuestionInfoGenerator model.iconNames) ]
+
+        CorrectSelection ->
+            model ! [ Random.generate SetQuestionInfo (getQuestionInfoGenerator model.iconNames) ]
 
         SetQuestionInfo info ->
             { model | questionInfo = Just info } ! []
 
+        IncorrectSelection ->
+            model ! []
+
 
 type alias QuestionInfo =
-    String
+    --this represntation means there are no invalid states
+    { first : String
+    , second : String
+    , third : String
+    , correctEntry : QuestionEntry
+    }
 
 
-questionInfoGenerator : Generator QuestionInfo
-questionInfoGenerator =
-    Random.int 0 6
-        |> Random.map (\index -> getAt index fallbackIconNames |> Maybe.withDefault "pan_tool")
+type QuestionEntry
+    = First
+    | Second
+    | Third
+
+
+getCorrectString : QuestionInfo -> String
+getCorrectString info =
+    case info.correctEntry of
+        First ->
+            info.first
+
+        Second ->
+            info.second
+
+        Third ->
+            info.third
+
+
+chooseNext =
+    (\( priorChoice, currentDeck ) ->
+        Random.Array.choose currentDeck
+            |> Random.map (\( choice, rest ) -> ( ( priorChoice, choice ), rest ))
+    )
+
+
+questionEntryGenerator =
+    Random.int 0 2
+        |> Random.map intToQuestionEntry
+
+
+intToQuestionEntry n =
+    case n of
+        0 ->
+            First
+
+        1 ->
+            Second
+
+        _ ->
+            Third
+
+
+getQuestionInfoGenerator : Array String -> Generator QuestionInfo
+getQuestionInfoGenerator deck =
+    Random.Array.choose deck
+        `Random.andThen` chooseNext
+        `Random.andThen` chooseNext
+        |> Random.map fst
+        |> Random.map
+            (\tuple ->
+                case tuple of
+                    ( ( Just first, Just second ), Just third ) ->
+                        QuestionInfo first second third
+
+                    _ ->
+                        QuestionInfo "change_history" "donut_large" "donut_small"
+            )
+        |> Random.map2 (|>) questionEntryGenerator
 
 
 view : Model -> Html Msg
@@ -63,26 +133,47 @@ view model =
         Just info ->
             div [ style [ ( "display", "flex" ), ( "flex-direction", "column" ), ( "align-items", "center" ) ] ]
                 [ text <| toString info
-                , viewIcon info
+                , info |> getCorrectString |> viewIcon
                 , div [ style [ ( "display", "flex" ), ( "flex-direction", "row" ) ] ]
-                    [ Html.button [ onClick GetNextQuestionInfo ] [ text info ]
-                    , Html.button [ onClick GetNextQuestionInfo ] [ text info ]
-                    , Html.button [ onClick GetNextQuestionInfo ] [ text info ]
-                    ]
+                    <| getListOfButtons info
                 ]
 
         Nothing ->
             Html.button [ onClick GetNextQuestionInfo ] [ text "Start" ]
 
 
+getListOfButtons : QuestionInfo -> List (Html Msg)
+getListOfButtons info =
+    [ Html.button
+        [ onClick
+            <| if info.correctEntry == First then
+                CorrectSelection
+               else
+                IncorrectSelection
+        ]
+        [ text info.first ]
+    , Html.button
+        [ onClick
+            <| if info.correctEntry == Second then
+                CorrectSelection
+               else
+                IncorrectSelection
+        ]
+        [ text info.second ]
+    , Html.button
+        [ onClick
+            <| if info.correctEntry == Third then
+                CorrectSelection
+               else
+                IncorrectSelection
+        ]
+        [ text info.third ]
+    ]
+
+
 viewIcon : String -> Html Msg
 viewIcon name =
     Icon.view name [ Icon.size48 ]
-
-
-getQuestionInfo : List String -> QuestionInfo
-getQuestionInfo list =
-    "TODO"
 
 
 getAt : Int -> List a -> Maybe a
@@ -108,4 +199,4 @@ main =
 
 
 fallbackIconNames =
-    [ "change_history", "donut_large", "donut_small", "flip_to_back", "grade", "perm_data_setting" ]
+    Array.fromList [ "change_history", "donut_large", "donut_small", "flip_to_back", "grade", "perm_data_setting" ]

@@ -9022,6 +9022,495 @@ var _elm_lang$core$Random$cmdMap = F2(
 	});
 _elm_lang$core$Native_Platform.effectManagers['Random'] = {pkg: 'elm-lang/core', init: _elm_lang$core$Random$init, onEffects: _elm_lang$core$Random$onEffects, onSelfMsg: _elm_lang$core$Random$onSelfMsg, tag: 'cmd', cmdMap: _elm_lang$core$Random$cmdMap};
 
+var _elm_community$elm_random_extra$Utils$get = F2(
+	function (index, list) {
+		if (_elm_lang$core$Native_Utils.cmp(index, 0) < 0) {
+			return _elm_lang$core$Maybe$Nothing;
+		} else {
+			var _p0 = A2(_elm_lang$core$List$drop, index, list);
+			if (_p0.ctor === '[]') {
+				return _elm_lang$core$Maybe$Nothing;
+			} else {
+				return _elm_lang$core$Maybe$Just(_p0._0);
+			}
+		}
+	});
+
+var _elm_community$elm_random_extra$Random_Extra$mapConstraint = F2(
+	function (constraint, generator) {
+		return A2(
+			_elm_lang$core$Random$map,
+			function (a) {
+				return {
+					ctor: '_Tuple2',
+					_0: a,
+					_1: constraint(a)
+				};
+			},
+			generator);
+	});
+var _elm_community$elm_random_extra$Random_Extra$quickGenerate = function (generator) {
+	return _elm_lang$core$Basics$fst(
+		A2(
+			_elm_lang$core$Random$step,
+			generator,
+			_elm_lang$core$Random$initialSeed(1)));
+};
+var _elm_community$elm_random_extra$Random_Extra$cappedGenerateUntil = F4(
+	function (maxGenerations, predicate, generator, seed) {
+		if (_elm_lang$core$Native_Utils.cmp(maxGenerations, 0) < 1) {
+			return _elm_lang$core$Native_List.fromArray(
+				[]);
+		} else {
+			var _p0 = A2(_elm_lang$core$Random$step, generator, seed);
+			var value = _p0._0;
+			var nextSeed = _p0._1;
+			return predicate(value) ? A2(
+				_elm_lang$core$List_ops['::'],
+				value,
+				A4(_elm_community$elm_random_extra$Random_Extra$cappedGenerateUntil, maxGenerations - 1, predicate, generator, nextSeed)) : _elm_lang$core$Native_List.fromArray(
+				[]);
+		}
+	});
+var _elm_community$elm_random_extra$Random_Extra$generateUntil = F3(
+	function (predicate, generator, seed) {
+		var _p1 = A2(_elm_lang$core$Random$step, generator, seed);
+		var value = _p1._0;
+		var nextSeed = _p1._1;
+		return predicate(value) ? A2(
+			_elm_lang$core$List_ops['::'],
+			value,
+			A3(_elm_community$elm_random_extra$Random_Extra$generateUntil, predicate, generator, nextSeed)) : _elm_lang$core$Native_List.fromArray(
+			[]);
+	});
+var _elm_community$elm_random_extra$Random_Extra$generateIterativelyUntil = F4(
+	function (maxLength, predicate, constructor, seed) {
+		var iterate = function (index) {
+			return (_elm_lang$core$Native_Utils.cmp(index, maxLength) > -1) ? _elm_lang$core$Native_List.fromArray(
+				[]) : A2(
+				_elm_lang$core$Basics_ops['++'],
+				A3(
+					_elm_community$elm_random_extra$Random_Extra$generateUntil,
+					predicate,
+					constructor(index),
+					seed),
+				iterate(index + 1));
+		};
+		return iterate(0);
+	});
+var _elm_community$elm_random_extra$Random_Extra$generateIterativelySuchThat = F2(
+	function (maxLength, predicate) {
+		return A2(
+			_elm_community$elm_random_extra$Random_Extra$generateIterativelyUntil,
+			maxLength,
+			function (a) {
+				return _elm_lang$core$Basics$not(
+					predicate(a));
+			});
+	});
+var _elm_community$elm_random_extra$Random_Extra$generateN = F3(
+	function (n, generator, seed) {
+		if (_elm_lang$core$Native_Utils.cmp(n, 0) < 1) {
+			return _elm_lang$core$Native_List.fromArray(
+				[]);
+		} else {
+			var _p2 = A2(_elm_lang$core$Random$step, generator, seed);
+			var value = _p2._0;
+			var nextSeed = _p2._1;
+			return A2(
+				_elm_lang$core$List_ops['::'],
+				value,
+				A3(_elm_community$elm_random_extra$Random_Extra$generateN, n - 1, generator, nextSeed));
+		}
+	});
+var _elm_community$elm_random_extra$Random_Extra$flatMap6 = F7(
+	function (constructor, generatorA, generatorB, generatorC, generatorD, generatorE, generatorF) {
+		return A2(
+			_elm_lang$core$Random$andThen,
+			generatorA,
+			function (a) {
+				return A2(
+					_elm_lang$core$Random$andThen,
+					generatorB,
+					function (b) {
+						return A2(
+							_elm_lang$core$Random$andThen,
+							generatorC,
+							function (c) {
+								return A2(
+									_elm_lang$core$Random$andThen,
+									generatorD,
+									function (d) {
+										return A2(
+											_elm_lang$core$Random$andThen,
+											generatorE,
+											function (e) {
+												return A2(
+													_elm_lang$core$Random$andThen,
+													generatorF,
+													function (f) {
+														return A6(constructor, a, b, c, d, e, f);
+													});
+											});
+									});
+							});
+					});
+			});
+	});
+var _elm_community$elm_random_extra$Random_Extra$flatMap5 = F6(
+	function (constructor, generatorA, generatorB, generatorC, generatorD, generatorE) {
+		return A2(
+			_elm_lang$core$Random$andThen,
+			generatorA,
+			function (a) {
+				return A2(
+					_elm_lang$core$Random$andThen,
+					generatorB,
+					function (b) {
+						return A2(
+							_elm_lang$core$Random$andThen,
+							generatorC,
+							function (c) {
+								return A2(
+									_elm_lang$core$Random$andThen,
+									generatorD,
+									function (d) {
+										return A2(
+											_elm_lang$core$Random$andThen,
+											generatorE,
+											function (e) {
+												return A5(constructor, a, b, c, d, e);
+											});
+									});
+							});
+					});
+			});
+	});
+var _elm_community$elm_random_extra$Random_Extra$flatMap4 = F5(
+	function (constructor, generatorA, generatorB, generatorC, generatorD) {
+		return A2(
+			_elm_lang$core$Random$andThen,
+			generatorA,
+			function (a) {
+				return A2(
+					_elm_lang$core$Random$andThen,
+					generatorB,
+					function (b) {
+						return A2(
+							_elm_lang$core$Random$andThen,
+							generatorC,
+							function (c) {
+								return A2(
+									_elm_lang$core$Random$andThen,
+									generatorD,
+									function (d) {
+										return A4(constructor, a, b, c, d);
+									});
+							});
+					});
+			});
+	});
+var _elm_community$elm_random_extra$Random_Extra$flatMap3 = F4(
+	function (constructor, generatorA, generatorB, generatorC) {
+		return A2(
+			_elm_lang$core$Random$andThen,
+			generatorA,
+			function (a) {
+				return A2(
+					_elm_lang$core$Random$andThen,
+					generatorB,
+					function (b) {
+						return A2(
+							_elm_lang$core$Random$andThen,
+							generatorC,
+							function (c) {
+								return A3(constructor, a, b, c);
+							});
+					});
+			});
+	});
+var _elm_community$elm_random_extra$Random_Extra$flatMap2 = F3(
+	function (constructor, generatorA, generatorB) {
+		return A2(
+			_elm_lang$core$Random$andThen,
+			generatorA,
+			function (a) {
+				return A2(
+					_elm_lang$core$Random$andThen,
+					generatorB,
+					function (b) {
+						return A2(constructor, a, b);
+					});
+			});
+	});
+var _elm_community$elm_random_extra$Random_Extra$flatMap = _elm_lang$core$Basics$flip(_elm_lang$core$Random$andThen);
+var _elm_community$elm_random_extra$Random_Extra$zip5 = _elm_lang$core$Random$map5(
+	F5(
+		function (v0, v1, v2, v3, v4) {
+			return {ctor: '_Tuple5', _0: v0, _1: v1, _2: v2, _3: v3, _4: v4};
+		}));
+var _elm_community$elm_random_extra$Random_Extra$zip4 = _elm_lang$core$Random$map4(
+	F4(
+		function (v0, v1, v2, v3) {
+			return {ctor: '_Tuple4', _0: v0, _1: v1, _2: v2, _3: v3};
+		}));
+var _elm_community$elm_random_extra$Random_Extra$zip3 = _elm_lang$core$Random$map3(
+	F3(
+		function (v0, v1, v2) {
+			return {ctor: '_Tuple3', _0: v0, _1: v1, _2: v2};
+		}));
+var _elm_community$elm_random_extra$Random_Extra$zip = _elm_lang$core$Random$map2(
+	F2(
+		function (v0, v1) {
+			return {ctor: '_Tuple2', _0: v0, _1: v1};
+		}));
+var _elm_community$elm_random_extra$Random_Extra$reduce = F3(
+	function (reducer, initial, generator) {
+		return A2(
+			_elm_lang$core$Random$map,
+			function (a) {
+				return A2(reducer, a, initial);
+			},
+			generator);
+	});
+var _elm_community$elm_random_extra$Random_Extra$fold = _elm_community$elm_random_extra$Random_Extra$reduce;
+var _elm_community$elm_random_extra$Random_Extra$andMap = F2(
+	function (funcGenerator, generator) {
+		return A3(
+			_elm_lang$core$Random$map2,
+			F2(
+				function (x, y) {
+					return x(y);
+				}),
+			funcGenerator,
+			generator);
+	});
+var _elm_community$elm_random_extra$Random_Extra$map6 = F7(
+	function (f, generatorA, generatorB, generatorC, generatorD, generatorE, generatorF) {
+		return A2(
+			_elm_community$elm_random_extra$Random_Extra$andMap,
+			A6(_elm_lang$core$Random$map5, f, generatorA, generatorB, generatorC, generatorD, generatorE),
+			generatorF);
+	});
+var _elm_community$elm_random_extra$Random_Extra$zip6 = _elm_community$elm_random_extra$Random_Extra$map6(
+	F6(
+		function (v0, v1, v2, v3, v4, v5) {
+			return {ctor: '_Tuple6', _0: v0, _1: v1, _2: v2, _3: v3, _4: v4, _5: v5};
+		}));
+var _elm_community$elm_random_extra$Random_Extra$constant = function (value) {
+	return A2(
+		_elm_lang$core$Random$map,
+		function (_p3) {
+			return value;
+		},
+		_elm_lang$core$Random$bool);
+};
+var _elm_community$elm_random_extra$Random_Extra$select = function (list) {
+	return A2(
+		_elm_lang$core$Random$map,
+		function (index) {
+			return A2(_elm_community$elm_random_extra$Utils$get, index, list);
+		},
+		A2(
+			_elm_lang$core$Random$int,
+			0,
+			_elm_lang$core$List$length(list) - 1));
+};
+var _elm_community$elm_random_extra$Random_Extra$selectWithDefault = F2(
+	function (defaultValue, list) {
+		return A2(
+			_elm_lang$core$Random$map,
+			_elm_lang$core$Maybe$withDefault(defaultValue),
+			_elm_community$elm_random_extra$Random_Extra$select(list));
+	});
+var _elm_community$elm_random_extra$Random_Extra$flattenList = function (generators) {
+	var _p4 = generators;
+	if (_p4.ctor === '[]') {
+		return _elm_community$elm_random_extra$Random_Extra$constant(
+			_elm_lang$core$Native_List.fromArray(
+				[]));
+	} else {
+		return A3(
+			_elm_lang$core$Random$map2,
+			F2(
+				function (x, y) {
+					return A2(_elm_lang$core$List_ops['::'], x, y);
+				}),
+			_p4._0,
+			_elm_community$elm_random_extra$Random_Extra$flattenList(_p4._1));
+	}
+};
+var _elm_community$elm_random_extra$Random_Extra$keepIf = F2(
+	function (predicate, generator) {
+		return A2(
+			_elm_lang$core$Random$andThen,
+			generator,
+			function (a) {
+				return predicate(a) ? _elm_community$elm_random_extra$Random_Extra$constant(a) : A2(_elm_community$elm_random_extra$Random_Extra$keepIf, predicate, generator);
+			});
+	});
+var _elm_community$elm_random_extra$Random_Extra$dropIf = function (predicate) {
+	return _elm_community$elm_random_extra$Random_Extra$keepIf(
+		function (a) {
+			return _elm_lang$core$Basics$not(
+				predicate(a));
+		});
+};
+var _elm_community$elm_random_extra$Random_Extra$generateSuchThat = F3(
+	function (predicate, generator, seed) {
+		return A2(
+			_elm_lang$core$Random$step,
+			A2(_elm_community$elm_random_extra$Random_Extra$keepIf, predicate, generator),
+			seed);
+	});
+var _elm_community$elm_random_extra$Random_Extra$frequency = F2(
+	function (pairs, defaultGenerator) {
+		var pick = F2(
+			function (choices, n) {
+				pick:
+				while (true) {
+					var _p5 = choices;
+					if ((_p5.ctor === '::') && (_p5._0.ctor === '_Tuple2')) {
+						var _p6 = _p5._0._0;
+						if (_elm_lang$core$Native_Utils.cmp(n, _p6) < 1) {
+							return _p5._0._1;
+						} else {
+							var _v2 = _p5._1,
+								_v3 = n - _p6;
+							choices = _v2;
+							n = _v3;
+							continue pick;
+						}
+					} else {
+						return defaultGenerator;
+					}
+				}
+			});
+		var total = _elm_lang$core$List$sum(
+			A2(
+				_elm_lang$core$List$map,
+				function (_p7) {
+					return _elm_lang$core$Basics$abs(
+						_elm_lang$core$Basics$fst(_p7));
+				},
+				pairs));
+		return _elm_lang$core$Native_Utils.eq(total, 0) ? defaultGenerator : A2(
+			_elm_lang$core$Random$andThen,
+			A2(_elm_lang$core$Random$float, 0, total),
+			pick(pairs));
+	});
+var _elm_community$elm_random_extra$Random_Extra$merge = F2(
+	function (generator1, generator2) {
+		return A2(
+			_elm_community$elm_random_extra$Random_Extra$frequency,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					{ctor: '_Tuple2', _0: 1, _1: generator1},
+					{ctor: '_Tuple2', _0: 1, _1: generator2}
+				]),
+			generator1);
+	});
+
+var _elm_community$elm_random_extra$Random_Array$choose = function (arr) {
+	if (_elm_lang$core$Array$isEmpty(arr)) {
+		return _elm_community$elm_random_extra$Random_Extra$constant(
+			{ctor: '_Tuple2', _0: _elm_lang$core$Maybe$Nothing, _1: arr});
+	} else {
+		var front = function (i) {
+			return A3(_elm_lang$core$Array$slice, 0, i, arr);
+		};
+		var lastIndex = _elm_lang$core$Array$length(arr) - 1;
+		var back = function (i) {
+			return _elm_lang$core$Native_Utils.eq(i, lastIndex) ? _elm_lang$core$Array$empty : A3(_elm_lang$core$Array$slice, i + 1, lastIndex + 1, arr);
+		};
+		var gen = A2(_elm_lang$core$Random$int, 0, lastIndex);
+		return A2(
+			_elm_lang$core$Random$map,
+			function (index) {
+				return {
+					ctor: '_Tuple2',
+					_0: A2(_elm_lang$core$Array$get, index, arr),
+					_1: A2(
+						_elm_lang$core$Array$append,
+						front(index),
+						back(index))
+				};
+			},
+			gen);
+	}
+};
+var _elm_community$elm_random_extra$Random_Array$shuffle = function (arr) {
+	if (_elm_lang$core$Array$isEmpty(arr)) {
+		return _elm_community$elm_random_extra$Random_Extra$constant(arr);
+	} else {
+		var helper = function (_p0) {
+			var _p1 = _p0;
+			var _p6 = _p1._0;
+			return A2(
+				_elm_lang$core$Random$andThen,
+				_elm_community$elm_random_extra$Random_Array$choose(_p1._1),
+				function (_p2) {
+					var _p3 = _p2;
+					var _p5 = _p3._1;
+					var _p4 = _p3._0;
+					if (_p4.ctor === 'Nothing') {
+						return _elm_community$elm_random_extra$Random_Extra$constant(
+							{ctor: '_Tuple2', _0: _p6, _1: _p5});
+					} else {
+						return helper(
+							{
+								ctor: '_Tuple2',
+								_0: A2(_elm_lang$core$List_ops['::'], _p4._0, _p6),
+								_1: _p5
+							});
+					}
+				});
+		};
+		return A2(
+			_elm_lang$core$Random$map,
+			function (_p7) {
+				return _elm_lang$core$Array$fromList(
+					_elm_lang$core$Basics$fst(_p7));
+			},
+			helper(
+				{
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_List.fromArray(
+						[]),
+					_1: arr
+				}));
+	}
+};
+var _elm_community$elm_random_extra$Random_Array$sample = function (arr) {
+	var gen = A2(
+		_elm_lang$core$Random$int,
+		0,
+		_elm_lang$core$Array$length(arr) - 1);
+	return A2(
+		_elm_lang$core$Random$map,
+		function (index) {
+			return A2(_elm_lang$core$Array$get, index, arr);
+		},
+		gen);
+};
+var _elm_community$elm_random_extra$Random_Array$emptyArray = _elm_community$elm_random_extra$Random_Extra$constant(_elm_lang$core$Array$empty);
+var _elm_community$elm_random_extra$Random_Array$array = F2(
+	function (arrayLength, generator) {
+		return A2(
+			_elm_lang$core$Random$map,
+			_elm_lang$core$Array$fromList,
+			A2(_elm_lang$core$Random$list, arrayLength, generator));
+	});
+var _elm_community$elm_random_extra$Random_Array$rangeLengthArray = F3(
+	function (minLength, maxLength, generator) {
+		return A2(
+			_elm_community$elm_random_extra$Random_Extra$flatMap,
+			function (len) {
+				return A2(_elm_community$elm_random_extra$Random_Array$array, len, generator);
+			},
+			A2(_elm_lang$core$Random$int, minLength, maxLength));
+	});
+
 //import Dict, List, Maybe, Native.Scheduler //
 
 var _evancz$elm_http$Native_Http = function() {
@@ -9380,17 +9869,15 @@ var _evancz$elm_http$Http$post = F3(
 			A2(_evancz$elm_http$Http$send, _evancz$elm_http$Http$defaultSettings, request));
 	});
 
-var _user$project$IconNonsense$fallbackIconNames = _elm_lang$core$Native_List.fromArray(
-	['change_history', 'donut_large', 'donut_small', 'flip_to_back', 'grade', 'perm_data_setting']);
+var _user$project$IconNonsense$fallbackIconNames = _elm_lang$core$Array$fromList(
+	_elm_lang$core$Native_List.fromArray(
+		['change_history', 'donut_large', 'donut_small', 'flip_to_back', 'grade', 'perm_data_setting']));
 var _user$project$IconNonsense$subscriptions = _elm_lang$core$Basics$always(_elm_lang$core$Platform_Sub$none);
 var _user$project$IconNonsense$getAt = F2(
 	function (i, list) {
 		return _elm_lang$core$List$head(
 			A2(_elm_lang$core$List$drop, i, list));
 	});
-var _user$project$IconNonsense$getQuestionInfo = function (list) {
-	return 'TODO';
-};
 var _user$project$IconNonsense$viewIcon = function (name) {
 	return A2(
 		_debois$elm_mdl$Material_Icon$view,
@@ -9398,32 +9885,124 @@ var _user$project$IconNonsense$viewIcon = function (name) {
 		_elm_lang$core$Native_List.fromArray(
 			[_debois$elm_mdl$Material_Icon$size48]));
 };
-var _user$project$IconNonsense$questionInfoGenerator = A2(
-	_elm_lang$core$Random$map,
-	function (index) {
-		return A2(
-			_elm_lang$core$Maybe$withDefault,
-			'pan_tool',
-			A2(_user$project$IconNonsense$getAt, index, _user$project$IconNonsense$fallbackIconNames));
-	},
-	A2(_elm_lang$core$Random$int, 0, 6));
+var _user$project$IconNonsense$chooseNext = function (_p0) {
+	var _p1 = _p0;
+	return A2(
+		_elm_lang$core$Random$map,
+		function (_p2) {
+			var _p3 = _p2;
+			return {
+				ctor: '_Tuple2',
+				_0: {ctor: '_Tuple2', _0: _p1._0, _1: _p3._0},
+				_1: _p3._1
+			};
+		},
+		_elm_community$elm_random_extra$Random_Array$choose(_p1._1));
+};
+var _user$project$IconNonsense$getCorrectString = function (info) {
+	var _p4 = info.correctEntry;
+	switch (_p4.ctor) {
+		case 'First':
+			return info.first;
+		case 'Second':
+			return info.second;
+		default:
+			return info.third;
+	}
+};
 var _user$project$IconNonsense$Model = F2(
 	function (a, b) {
 		return {iconNames: a, questionInfo: b};
 	});
+var _user$project$IconNonsense$QuestionInfo = F4(
+	function (a, b, c, d) {
+		return {first: a, second: b, third: c, correctEntry: d};
+	});
+var _user$project$IconNonsense$IncorrectSelection = {ctor: 'IncorrectSelection'};
+var _user$project$IconNonsense$CorrectSelection = {ctor: 'CorrectSelection'};
 var _user$project$IconNonsense$SetQuestionInfo = function (a) {
 	return {ctor: 'SetQuestionInfo', _0: a};
 };
+var _user$project$IconNonsense$GetNextQuestionInfo = {ctor: 'GetNextQuestionInfo'};
+var _user$project$IconNonsense$RecieveIconName = function (a) {
+	return {ctor: 'RecieveIconName', _0: a};
+};
+var _user$project$IconNonsense$getIconNames = A3(
+	_elm_lang$core$Task$perform,
+	_elm_lang$core$Basics$always(
+		_user$project$IconNonsense$RecieveIconName(_user$project$IconNonsense$fallbackIconNames)),
+	_user$project$IconNonsense$RecieveIconName,
+	A2(
+		_evancz$elm_http$Http$get,
+		_elm_lang$core$Json_Decode$array(_elm_lang$core$Json_Decode$string),
+		'icon-names.json'));
+var _user$project$IconNonsense$init = A2(
+	_elm_lang$core$Platform_Cmd_ops['!'],
+	{
+		iconNames: _elm_lang$core$Array$fromList(
+			_elm_lang$core$Native_List.fromArray(
+				[])),
+		questionInfo: _elm_lang$core$Maybe$Nothing
+	},
+	_elm_lang$core$Native_List.fromArray(
+		[_user$project$IconNonsense$getIconNames]));
+var _user$project$IconNonsense$Third = {ctor: 'Third'};
+var _user$project$IconNonsense$Second = {ctor: 'Second'};
+var _user$project$IconNonsense$First = {ctor: 'First'};
+var _user$project$IconNonsense$intToQuestionEntry = function (n) {
+	var _p5 = n;
+	switch (_p5) {
+		case 0:
+			return _user$project$IconNonsense$First;
+		case 1:
+			return _user$project$IconNonsense$Second;
+		default:
+			return _user$project$IconNonsense$Third;
+	}
+};
+var _user$project$IconNonsense$questionEntryGenerator = A2(
+	_elm_lang$core$Random$map,
+	_user$project$IconNonsense$intToQuestionEntry,
+	A2(_elm_lang$core$Random$int, 0, 2));
+var _user$project$IconNonsense$getQuestionInfoGenerator = function (deck) {
+	return A3(
+		_elm_lang$core$Random$map2,
+		F2(
+			function (x, y) {
+				return y(x);
+			}),
+		_user$project$IconNonsense$questionEntryGenerator,
+		A2(
+			_elm_lang$core$Random$map,
+			function (tuple) {
+				var _p6 = tuple;
+				if (((((_p6.ctor === '_Tuple2') && (_p6._0.ctor === '_Tuple2')) && (_p6._0._0.ctor === 'Just')) && (_p6._0._1.ctor === 'Just')) && (_p6._1.ctor === 'Just')) {
+					return A3(_user$project$IconNonsense$QuestionInfo, _p6._0._0._0, _p6._0._1._0, _p6._1._0);
+				} else {
+					return A3(_user$project$IconNonsense$QuestionInfo, 'change_history', 'donut_large', 'donut_small');
+				}
+			},
+			A2(
+				_elm_lang$core$Random$map,
+				_elm_lang$core$Basics$fst,
+				A2(
+					_elm_lang$core$Random$andThen,
+					A2(
+						_elm_lang$core$Random$andThen,
+						_elm_community$elm_random_extra$Random_Array$choose(deck),
+						_user$project$IconNonsense$chooseNext),
+					_user$project$IconNonsense$chooseNext))));
+};
 var _user$project$IconNonsense$update = F2(
 	function (msg, model) {
-		var _p0 = msg;
-		switch (_p0.ctor) {
+		var _p7 = msg;
+		switch (_p7.ctor) {
 			case 'RecieveIconName':
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					_elm_lang$core$Native_Utils.update(
 						model,
-						{iconNames: _p0._0}),
+						{iconNames: _p7._0}),
 					_elm_lang$core$Native_List.fromArray(
 						[]));
 			case 'GetNextQuestionInfo':
@@ -9432,25 +10011,82 @@ var _user$project$IconNonsense$update = F2(
 					model,
 					_elm_lang$core$Native_List.fromArray(
 						[
-							A2(_elm_lang$core$Random$generate, _user$project$IconNonsense$SetQuestionInfo, _user$project$IconNonsense$questionInfoGenerator)
+							A2(
+							_elm_lang$core$Random$generate,
+							_user$project$IconNonsense$SetQuestionInfo,
+							_user$project$IconNonsense$getQuestionInfoGenerator(model.iconNames))
 						]));
-			default:
+			case 'CorrectSelection':
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					model,
+					_elm_lang$core$Native_List.fromArray(
+						[
+							A2(
+							_elm_lang$core$Random$generate,
+							_user$project$IconNonsense$SetQuestionInfo,
+							_user$project$IconNonsense$getQuestionInfoGenerator(model.iconNames))
+						]));
+			case 'SetQuestionInfo':
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{
-							questionInfo: _elm_lang$core$Maybe$Just(_p0._0)
+							questionInfo: _elm_lang$core$Maybe$Just(_p7._0)
 						}),
+					_elm_lang$core$Native_List.fromArray(
+						[]));
+			default:
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					model,
 					_elm_lang$core$Native_List.fromArray(
 						[]));
 		}
 	});
-var _user$project$IconNonsense$GetNextQuestionInfo = {ctor: 'GetNextQuestionInfo'};
+var _user$project$IconNonsense$getListOfButtons = function (info) {
+	return _elm_lang$core$Native_List.fromArray(
+		[
+			A2(
+			_elm_lang$html$Html$button,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html_Events$onClick(
+					_elm_lang$core$Native_Utils.eq(info.correctEntry, _user$project$IconNonsense$First) ? _user$project$IconNonsense$CorrectSelection : _user$project$IconNonsense$IncorrectSelection)
+				]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html$text(info.first)
+				])),
+			A2(
+			_elm_lang$html$Html$button,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html_Events$onClick(
+					_elm_lang$core$Native_Utils.eq(info.correctEntry, _user$project$IconNonsense$Second) ? _user$project$IconNonsense$CorrectSelection : _user$project$IconNonsense$IncorrectSelection)
+				]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html$text(info.second)
+				])),
+			A2(
+			_elm_lang$html$Html$button,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html_Events$onClick(
+					_elm_lang$core$Native_Utils.eq(info.correctEntry, _user$project$IconNonsense$Third) ? _user$project$IconNonsense$CorrectSelection : _user$project$IconNonsense$IncorrectSelection)
+				]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html$text(info.third)
+				]))
+		]);
+};
 var _user$project$IconNonsense$view = function (model) {
-	var _p1 = model.questionInfo;
-	if (_p1.ctor === 'Just') {
-		var _p2 = _p1._0;
+	var _p8 = model.questionInfo;
+	if (_p8.ctor === 'Just') {
+		var _p9 = _p8._0;
 		return A2(
 			_elm_lang$html$Html$div,
 			_elm_lang$core$Native_List.fromArray(
@@ -9466,8 +10102,9 @@ var _user$project$IconNonsense$view = function (model) {
 			_elm_lang$core$Native_List.fromArray(
 				[
 					_elm_lang$html$Html$text(
-					_elm_lang$core$Basics$toString(_p2)),
-					_user$project$IconNonsense$viewIcon(_p2),
+					_elm_lang$core$Basics$toString(_p9)),
+					_user$project$IconNonsense$viewIcon(
+					_user$project$IconNonsense$getCorrectString(_p9)),
 					A2(
 					_elm_lang$html$Html$div,
 					_elm_lang$core$Native_List.fromArray(
@@ -9479,39 +10116,7 @@ var _user$project$IconNonsense$view = function (model) {
 									{ctor: '_Tuple2', _0: 'flex-direction', _1: 'row'}
 								]))
 						]),
-					_elm_lang$core$Native_List.fromArray(
-						[
-							A2(
-							_elm_lang$html$Html$button,
-							_elm_lang$core$Native_List.fromArray(
-								[
-									_elm_lang$html$Html_Events$onClick(_user$project$IconNonsense$GetNextQuestionInfo)
-								]),
-							_elm_lang$core$Native_List.fromArray(
-								[
-									_elm_lang$html$Html$text(_p2)
-								])),
-							A2(
-							_elm_lang$html$Html$button,
-							_elm_lang$core$Native_List.fromArray(
-								[
-									_elm_lang$html$Html_Events$onClick(_user$project$IconNonsense$GetNextQuestionInfo)
-								]),
-							_elm_lang$core$Native_List.fromArray(
-								[
-									_elm_lang$html$Html$text(_p2)
-								])),
-							A2(
-							_elm_lang$html$Html$button,
-							_elm_lang$core$Native_List.fromArray(
-								[
-									_elm_lang$html$Html_Events$onClick(_user$project$IconNonsense$GetNextQuestionInfo)
-								]),
-							_elm_lang$core$Native_List.fromArray(
-								[
-									_elm_lang$html$Html$text(_p2)
-								]))
-						]))
+					_user$project$IconNonsense$getListOfButtons(_p9))
 				]));
 	} else {
 		return A2(
@@ -9526,27 +10131,6 @@ var _user$project$IconNonsense$view = function (model) {
 				]));
 	}
 };
-var _user$project$IconNonsense$RecieveIconName = function (a) {
-	return {ctor: 'RecieveIconName', _0: a};
-};
-var _user$project$IconNonsense$getIconNames = A3(
-	_elm_lang$core$Task$perform,
-	_elm_lang$core$Basics$always(
-		_user$project$IconNonsense$RecieveIconName(_user$project$IconNonsense$fallbackIconNames)),
-	_user$project$IconNonsense$RecieveIconName,
-	A2(
-		_evancz$elm_http$Http$get,
-		_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string),
-		'icon-names.json'));
-var _user$project$IconNonsense$init = A2(
-	_elm_lang$core$Platform_Cmd_ops['!'],
-	{
-		iconNames: _elm_lang$core$Native_List.fromArray(
-			[]),
-		questionInfo: _elm_lang$core$Maybe$Nothing
-	},
-	_elm_lang$core$Native_List.fromArray(
-		[_user$project$IconNonsense$getIconNames]));
 var _user$project$IconNonsense$main = {
 	main: _elm_lang$html$Html_App$program(
 		{init: _user$project$IconNonsense$init, update: _user$project$IconNonsense$update, subscriptions: _user$project$IconNonsense$subscriptions, view: _user$project$IconNonsense$view})
