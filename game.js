@@ -9927,6 +9927,31 @@ var _user$project$IconNonsense$SetQuestionInfo = function (a) {
 var _user$project$IconNonsense$GetNextQuestionInfo = function (a) {
 	return {ctor: 'GetNextQuestionInfo', _0: a};
 };
+var _user$project$IconNonsense$modeButtons = _elm_lang$core$Native_List.fromArray(
+	[
+		A2(
+		_elm_lang$html$Html$button,
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Events$onClick(
+				_user$project$IconNonsense$GetNextQuestionInfo(_user$project$IconNonsense$ChooseIcon))
+			]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html$text('Choose Icon Mode')
+			])),
+		A2(
+		_elm_lang$html$Html$button,
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Events$onClick(
+				_user$project$IconNonsense$GetNextQuestionInfo(_user$project$IconNonsense$ChooseName))
+			]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html$text('Choose Name Mode')
+			]))
+	]);
 var _user$project$IconNonsense$RecieveIconName = function (a) {
 	return {ctor: 'RecieveIconName', _0: a};
 };
@@ -10115,57 +10140,51 @@ var _user$project$IconNonsense$view = function (model) {
 			var _p9 = model.questionInfo;
 			if (_p9.ctor === 'Just') {
 				var _p11 = _p9._0;
-				var _p10 = model.mode;
-				if (_p10.ctor === 'ChooseName') {
-					return _elm_lang$core$Native_List.fromArray(
+				return A2(
+					_elm_lang$core$Basics_ops['++'],
+					function () {
+						var _p10 = model.mode;
+						if (_p10.ctor === 'ChooseName') {
+							return _elm_lang$core$Native_List.fromArray(
+								[
+									_elm_lang$html$Html$text('Pick the name they gave to this icon:'),
+									_user$project$IconNonsense$viewIcon(
+									_user$project$IconNonsense$getCorrectString(_p11)),
+									A2(_user$project$IconNonsense$getListOfButtons, model.mode, _p11)
+								]);
+						} else {
+							return _elm_lang$core$Native_List.fromArray(
+								[
+									_elm_lang$html$Html$text('Pick the icon they gave this name to:'),
+									A2(
+									_elm_lang$html$Html$strong,
+									_elm_lang$core$Native_List.fromArray(
+										[]),
+									_elm_lang$core$Native_List.fromArray(
+										[
+											_elm_lang$html$Html$text(
+											_user$project$IconNonsense$getCorrectString(_p11))
+										])),
+									A2(_user$project$IconNonsense$getListOfButtons, model.mode, _p11)
+								]);
+						}
+					}(),
+					_elm_lang$core$Native_List.fromArray(
 						[
-							_elm_lang$html$Html$text('Pick the name they gave to this icon:'),
-							_user$project$IconNonsense$viewIcon(
-							_user$project$IconNonsense$getCorrectString(_p11)),
-							A2(_user$project$IconNonsense$getListOfButtons, model.mode, _p11)
-						]);
-				} else {
-					return _elm_lang$core$Native_List.fromArray(
-						[
-							_elm_lang$html$Html$text('Pick the icon they gave this name to:'),
 							A2(
-							_elm_lang$html$Html$strong,
-							_elm_lang$core$Native_List.fromArray(
-								[]),
+							_elm_lang$html$Html$div,
 							_elm_lang$core$Native_List.fromArray(
 								[
-									_elm_lang$html$Html$text(
-									_user$project$IconNonsense$getCorrectString(_p11))
-								])),
-							A2(_user$project$IconNonsense$getListOfButtons, model.mode, _p11)
-						]);
-				}
+									_elm_lang$html$Html_Attributes$style(
+									_elm_lang$core$Native_List.fromArray(
+										[
+											{ctor: '_Tuple2', _0: 'margin-top', _1: '5VH'}
+										]))
+								]),
+							_user$project$IconNonsense$modeButtons)
+						]));
 			} else {
-				return _elm_lang$core$Native_List.fromArray(
-					[
-						A2(
-						_elm_lang$html$Html$button,
-						_elm_lang$core$Native_List.fromArray(
-							[
-								_elm_lang$html$Html_Events$onClick(
-								_user$project$IconNonsense$GetNextQuestionInfo(_user$project$IconNonsense$ChooseIcon))
-							]),
-						_elm_lang$core$Native_List.fromArray(
-							[
-								_elm_lang$html$Html$text('Choose Icon Mode')
-							])),
-						A2(
-						_elm_lang$html$Html$button,
-						_elm_lang$core$Native_List.fromArray(
-							[
-								_elm_lang$html$Html_Events$onClick(
-								_user$project$IconNonsense$GetNextQuestionInfo(_user$project$IconNonsense$ChooseName))
-							]),
-						_elm_lang$core$Native_List.fromArray(
-							[
-								_elm_lang$html$Html$text('Choose Name Mode')
-							]))
-					]);
+				return _user$project$IconNonsense$modeButtons;
 			}
 		}());
 };

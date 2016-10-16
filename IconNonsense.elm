@@ -129,12 +129,18 @@ getQuestionInfoGenerator deck =
         |> Random.map2 (|>) questionEntryGenerator
 
 
+modeButtons =
+    [ Html.button [ onClick <| GetNextQuestionInfo ChooseIcon ] [ text "Choose Icon Mode" ]
+    , Html.button [ onClick <| GetNextQuestionInfo ChooseName ] [ text "Choose Name Mode" ]
+    ]
+
+
 view : Model -> Html Msg
 view model =
     div [ style [ ( "display", "flex" ), ( "flex-direction", "column" ), ( "align-items", "center" ) ] ]
         <| case model.questionInfo of
             Just info ->
-                case model.mode of
+                (case model.mode of
                     ChooseName ->
                         [ text "Pick the name they gave to this icon:"
                         , info |> getCorrectString |> viewIcon
@@ -146,11 +152,11 @@ view model =
                         , [ info |> getCorrectString |> text ] |> Html.strong []
                         , getListOfButtons model.mode info
                         ]
+                )
+                    ++ [ div [ style [ ( "margin-top", "5VH" ) ] ] modeButtons ]
 
             Nothing ->
-                [ Html.button [ onClick <| GetNextQuestionInfo ChooseIcon ] [ text "Choose Icon Mode" ]
-                , Html.button [ onClick <| GetNextQuestionInfo ChooseName ] [ text "Choose Name Mode" ]
-                ]
+                modeButtons
 
 
 getListOfButtons : Mode -> QuestionInfo -> Html Msg
