@@ -1,5 +1,3 @@
-# elm-app-template
-A template for elm web apps that doesn't use any folders besides the top level one.
+# Icon Nonsense
 
-> Flat is better than nested.
->     — [The Zen of Python](https://www.python.org/dev/peps/pep-0020/)
+A quick little <del>game</del> activity to demonstate how about 10% of the material icons have really unintuitive names. 
